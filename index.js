@@ -1,14 +1,11 @@
-import PropTypes from 'prop-types';
-import React from 'react';
-import rip from 'rip-out';
+import PropTypes from "prop-types";
+import React from "react";
+import rip from "rip-out";
 
 //
 // Allow both numbers and strings to represent a value.
 //
-const numb = PropTypes.oneOfType([
-  PropTypes.string,
-  PropTypes.number
-]);
+const numb = PropTypes.oneOfType([PropTypes.string, PropTypes.number]);
 
 /**
  * Helper function to copy and paste over properties to a different object if
@@ -20,7 +17,7 @@ const numb = PropTypes.oneOfType([
  * @private
  */
 function copypaste(from, to, ...props) {
-  props.forEach((prop) => {
+  props.forEach(prop => {
     if (prop in from) to[prop] = from[prop];
   });
 }
@@ -35,10 +32,20 @@ function copypaste(from, to, ...props) {
  * @private
  */
 function prepare(props) {
-  const clean = rip(props,
-    'translate', 'scale', 'rotate', 'skewX', 'skewY', 'originX', 'originY',
-    'fontFamily', 'fontSize', 'fontWeight', 'fontStyle',
-    'style'
+  const clean = rip(
+    props,
+    "translate",
+    "scale",
+    "rotate",
+    "skewX",
+    "skewY",
+    "originX",
+    "originY",
+    "fontFamily",
+    "fontSize",
+    "fontWeight",
+    "fontStyle",
+    "style"
   );
 
   const transform = [];
@@ -48,27 +55,29 @@ function prepare(props) {
   // To apply originX and originY we need to translate the element on those values and
   // translate them back once the element is scaled, rotated and skewed.
   //
-  if ('originX' in props || 'originY' in props) transform.push(`translate(${props.originX || 0}, ${props.originY || 0})`);
-  if ('translate' in props) transform.push(`translate(${props.translate})`);
-  if ('scale' in props) transform.push(`scale(${props.scale})`);
-  if ('rotate' in props) transform.push(`rotate(${props.rotate})`);
-  if ('skewX' in props) transform.push(`skewX(${props.skewX})`);
-  if ('skewY' in props) transform.push(`skewY(${props.skewY})`);
-  if ('originX' in props || 'originY' in props) transform.push(`translate(${-props.originX || 0}, ${-props.originY || 0})`);
-  if (transform.length) clean.transform = transform.join(' ');
+  if ("originX" in props || "originY" in props)
+    transform.push(`translate(${props.originX || 0}, ${props.originY || 0})`);
+  if ("translate" in props) transform.push(`translate(${props.translate})`);
+  if ("scale" in props) transform.push(`scale(${props.scale})`);
+  if ("rotate" in props) transform.push(`rotate(${props.rotate})`);
+  if ("skewX" in props) transform.push(`skewX(${props.skewX})`);
+  if ("skewY" in props) transform.push(`skewY(${props.skewY})`);
+  if ("originX" in props || "originY" in props)
+    transform.push(`translate(${-props.originX || 0}, ${-props.originY || 0})`);
+  if (transform.length) clean.transform = transform.join(" ");
 
   //
   // Correctly set the initial style value.
   //
-  const style = ('style' in props) ? props.style : {};
-  
+  const style = "style" in props ? props.style : {};
+
   //
   // This is the nasty part where we depend on React internals to work as
   // intended. If we add an empty object as style, it shouldn't render a `style`
   // attribute. So we can safely conditionally add things to our `style` object
   // and re-introduce it to our `clean` object
   //
-  copypaste(props, style, 'fontFamily', 'fontSize', 'fontWeight', 'fontStyle');
+  copypaste(props, style, "fontFamily", "fontSize", "fontWeight", "fontStyle");
   clean.style = style;
 
   return clean;
@@ -81,179 +90,208 @@ function prepare(props) {
  * @returns {React.Component} Circle SVG.
  * @public
  */
-function Circle(props) {
-  return <circle { ...prepare(props) } />;
+class Circle extends React.Component {
+  render() {
+    return <circle {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a clipPath SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} ClipPath SVG.
  * @public
  */
-function ClipPath(props) {
-  return <clipPath { ...prepare(props) } />;
+class ClipPath extends React.Component {
+  render() {
+    return <clipPath {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a defs SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Defs SVG.
  * @public
  */
-function Defs(props) {
-  return <defs { ...prepare(props) } />;
+class Defs extends React.Component {
+  render() {
+    return <defs {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a ellipse SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Ellipse SVG.
  * @public
  */
-function Ellipse(props) {
-  return <ellipse { ...prepare(props) } />;
+class Ellipse extends React.Component {
+  render() {
+    return <ellipse {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a g SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} G SVG.
  * @public
  */
-function G(props) {
-  const { x, y, ...rest } = props;
+class G extends React.Component {
+  render() {
+    const { x, y, ...rest } = this.props;
 
-  if ((x || y) && !rest.translate) {
-    rest.translate = `${x || 0}, ${y || 0}`;
+    if ((x || y) && !rest.translate) {
+      rest.translate = `${x || 0}, ${y || 0}`;
+    }
+
+    return <g {...prepare(rest)} />;
   }
-
-  return <g { ...prepare(rest) } />;
 }
 
 /**
  * Return a image SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Image SVG.
  * @public
  */
-function Image(props) {
-  return <image { ...prepare(props) } />;
+class Image extends React.Component {
+  render() {
+    return <image {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a line SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Line SVG.
  * @public
  */
-function Line(props) {
-  return <line { ...prepare(props) } />;
+class Line extends React.Component {
+  render() {
+    return <line {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a linearGradient SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} LinearGradient SVG.
  * @public
  */
-function LinearGradient(props) {
-  return <linearGradient { ...prepare(props) } />;
+class LinearGradient extends React.Component {
+  render() {
+    return <linearGradient {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a path SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Path SVG.
  * @public
  */
-function Path(props) {
-  return <path { ...prepare(props) } />;
+class Path extends React.Component {
+  render() {
+    return <path {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a polygon SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Polygon SVG.
  * @public
  */
-function Polygon(props) {
-  return <polygon { ...prepare(props) } />;
+class Polygon extends React.Component {
+  render() {
+    return <polygon {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a polyline SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Polyline SVG.
  * @public
  */
-function Polyline(props) {
-  return <polyline { ...prepare(props) } />;
+class Polyline extends React.Component {
+  render() {
+    return <polyline {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a radialGradient SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} RadialGradient SVG.
  * @public
  */
-function RadialGradient(props) {
-  return <radialGradient { ...prepare(props) } />;
+class RadialGradient extends React.Component {
+  render() {
+    return <radialGradient {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a rect SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Rect SVG.
  * @public
  */
-function Rect(props) {
-  return <rect { ...prepare(props) } />;
+class Rect extends React.Component {
+  render() {
+    return <rect {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a stop SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} Stop SVG.
  * @public
  */
-function Stop(props) {
-  return <stop { ...prepare(props) } />;
+class Stop extends React.Component {
+  render() {
+    return <stop {...prepare(this.props)} />;
+  }
 }
 
 /**
  * Return a SVG element.
  *
- * @param {Object} props The properties that are spread on the SVG element.
+ * @param {Object} this.props The properties that are spread on the SVG element.
  * @returns {React.Component} SVG.
  * @public
  */
-function Svg(props) {
-  const { title, ...rest } = props;
+class Svg extends React.Component {
+  render() {
+    const { title, ...rest } = this.props;
+    if (title) {
+      return (
+        <svg role="img" aria-label="[title]" {...prepare(rest)}>
+          <title>{title}</title>
+          {this.props.children}
+        </svg>
+      );
+    }
 
-  if (title) {
-    return (
-      <svg role='img' aria-label='[title]' { ...prepare(rest) }>
-        <title>{ title }</title>
-        { props.children }
-      </svg>
-    );
+    return <svg {...prepare(rest)} />;
   }
-
-  return <svg { ...prepare(rest) } />;
 }
 
 Svg.propTypes = {
@@ -268,8 +306,10 @@ Svg.propTypes = {
  * @returns {React.Component} Symbol SVG.
  * @public
  */
-function Symbol(props) {
-  return <symbol { ...prepare(props) } />;
+class Symbol extends React.Component {
+  render() {
+    return <symbol {...prepare(props)} />;
+  }
 }
 
 /**
@@ -284,9 +324,11 @@ function Symbol(props) {
  * @param {String} props.dy delta y
  * @param {String} props.rotate rotation
  */
-function Text(props) {
-  const { x, y, dx, dy, rotate, ...rest } = props;
-  return <text { ...prepare(rest) } { ...{ x, y, dx, dy, rotate } } />;
+class Text extends React.Component {
+  render() {
+    const { x, y, dx, dy, rotate, ...rest } = props;
+    return <text {...prepare(rest)} {...{ x, y, dx, dy, rotate }} />;
+  }
 }
 
 Text.propTypes = {
@@ -294,7 +336,7 @@ Text.propTypes = {
   y: numb,
   dx: numb,
   dy: numb,
-  rotate: numb,
+  rotate: numb
 };
 
 /**
@@ -309,9 +351,11 @@ Text.propTypes = {
  * @param {String} props.dy delta y
  * @param {String} props.rotate rotation
  */
-function TSpan(props) {
-  const { x, y, dx, dy, rotate, ...rest } = props;
-  return <tspan { ...prepare(rest) } { ...{ x, y, dx, dy, rotate } } />;
+class TSpan extends React.Component {
+  render() {
+    const { x, y, dx, dy, rotate, ...rest } = props;
+    return <tspan {...prepare(rest)} {...{ x, y, dx, dy, rotate }} />;
+  }
 }
 
 TSpan.propTypes = Text.propTypes;
@@ -323,8 +367,10 @@ TSpan.propTypes = Text.propTypes;
  * @returns {React.Component} TextPath SVG.
  * @public
  */
-function TextPath(props) {
-  return <textPath { ...prepare(props) } />;
+class TextPath extends React.Component {
+  render() {
+    return <textPath {...prepare(props)} />;
+  }
 }
 
 /**
@@ -334,8 +380,10 @@ function TextPath(props) {
  * @returns {React.Component} Use SVG.
  * @public
  */
-function Use(props) {
-  return <use { ...prepare(props) } />;
+class Use extends React.Component {
+  render() {
+    return <use {...prepare(props)} />;
+  }
 }
 
 //
