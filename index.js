@@ -92,14 +92,14 @@ function prepare(props) {
  */
 class Circle extends React.Component {
   setNativeProps(nativeProps) {
-    if (this._root) this._root.setNativeProps(nativeProps);
+    if (this._component) this._component.setNativeProps(nativeProps);
   }
 
   render() {
     return (
       <circle
         ref={component => {
-          this._root = component;
+          this._component = component;
         }}
         {...prepare(this.props)}
       />
@@ -264,15 +264,15 @@ class RadialGradient extends React.Component {
  * @public
  */
 class Rect extends React.Component {
-  setNativeProps = props => {
-    this._component && this._component.setNativeProps(props);
-  };
+  setNativeProps(nativeProps) {
+    this._component && this._component.setNativeProps(nativeProps);
+  }
 
   render() {
     return (
       <rect
         ref={component => {
-          this._root = component;
+          this._component = component;
         }}
         {...prepare(this.props)}
       />
@@ -301,9 +301,9 @@ class Stop extends React.Component {
  * @public
  */
 class Svg extends React.Component {
-  setNativeProps = props => {
-    this._component && this._component.setNativeProps(props);
-  };
+  setNativeProps(nativeProps) {
+    this._component && this._component.setNativeProps(nativeProps);
+  }
 
   render() {
     const { title, ...rest } = this.props;
@@ -311,7 +311,7 @@ class Svg extends React.Component {
       return (
         <svg
           ref={component => {
-            this._root = component;
+            this._component = component;
           }}
           role="img"
           aria-label="[title]"
@@ -326,7 +326,7 @@ class Svg extends React.Component {
     return (
       <svg
         ref={component => {
-          this._root = component;
+          this._component = component;
         }}
         {...prepare(rest)}
       />
